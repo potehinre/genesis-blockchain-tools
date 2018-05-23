@@ -41,7 +41,7 @@ from genesis_blockchain_tools.crypto import sign
 
 priv_key = '2922bee6973370915cc63ab5ab8b7a57e1cab909477d7a030b2e4661e7aa2202'
 data = "Some data to sign"
-signature = sing(priv_key, data)
+signature = sign(priv_key, data)
 ```
 
 Requirements

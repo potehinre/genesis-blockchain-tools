@@ -10,7 +10,6 @@ with open(os.path.join(here, 'README.md')) as f:
 
 requires = [
     'pytest',
-    'fastecdsa',
 ]
 
 setup(

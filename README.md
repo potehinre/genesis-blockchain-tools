@@ -16,7 +16,7 @@ Using pip:
 * Activate your virtualenv
 * pip install git+https://github.com/blitzstern5/genesis-blockchain-tools
 
-Using pip/requirements
+Using pip/requirements:
 
 * Activate your virtualenv
 * Add 'git+https://github.com/blitzstern5/genesis-blockchain-tools' to your requirements.txt

@@ -4,6 +4,36 @@ Genesis BlockChain Tools
 Setup
 -----
 
+## Prerequisites:
+
+Currenty three cryptographic backend modules are supported:
+* [ECPy](http://ubinity.github.io/ECPy/)
+* [fastecdsa](https://github.com/AntonKueltz/fastecdsa)
+* [rubenesque](https://github.com/latchset/python-rubenesque)
+
+### Setting up ECPy
+
+ECPy is pure python implementation of ECDSA. Use this module if you have a issues with dependencies installation (on Windows for exapmle):
+
+```
+pip install ECPy
+```
+
+### Setting up fastecdsa
+fastecdsa is C/C++ module. It's the fastest between two others. Use this module if you have no issues with dependencies (on Linux for example):
+
+```
+pip install fastecdsa
+```
+
+### Setting up rubenesque
+
+rubenesque is pure python implementaion of ECDSA also. But it's not on PyPI repository. So if you want to use it you have to install it from github repository directly:
+
+```
+pip install git+https://github.com/latchset/python-rubenesque
+```
+
 Manual installation:
 
 * Activate your virtualenv

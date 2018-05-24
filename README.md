@@ -13,14 +13,15 @@ Currenty three cryptographic backend modules are supported:
 
 ### Setting up ECPy
 
-ECPy is pure python implementation of ECDSA. Use this module if you have a issues with dependencies installation (on Windows for exapmle):
+ECPy is pure python implementation of ECDSA. Use this module if you have issues with dependencies installation (on Windows for exapmle):
 
 ```
 pip install ECPy
 ```
 
 ### Setting up fastecdsa
-fastecdsa is C/C++ module. It's the fastest between two others. Use this module if you have no issues with dependencies (on Linux for example):
+
+fastecdsa is C/C++ module. It's the fastest between two others. Use this module if you have no issues with dependencies (on Debian/Ubuntu Linux for example):
 
 ```
 pip install fastecdsa
@@ -28,7 +29,7 @@ pip install fastecdsa
 
 ### Setting up rubenesque
 
-rubenesque is pure python implementaion of ECDSA also. But it's not on PyPI repository. So if you want to use it you have to install it from github repository directly:
+rubenesque is pure python implementaion of ECDSA also. But it's not on PyPI. So if you want to use it you have to install it from github repository directly:
 
 ```
 pip install git+https://github.com/latchset/python-rubenesque

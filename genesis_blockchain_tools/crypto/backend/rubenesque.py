@@ -31,7 +31,7 @@ def get_public_key(priv_key, curve=curve.P256):
 def gen_keypair(curve=curve.P256):
     priv_key = gen_private_key(curve=curve)
     pub_key = get_public_key(priv_key)
-    return priv_key + pub_key
+    return priv_key, pub_key
 
 
 def sign(priv_key, data, hashfunc=sha256, curve=curve.P256):

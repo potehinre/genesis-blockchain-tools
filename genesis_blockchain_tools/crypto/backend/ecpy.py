@@ -63,9 +63,13 @@ def gen_keypair(curve=curve.P256):
     pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
     return format(priv_key, 'x'), point_to_hex_str(pub_key_obj)
 
-def sign(priv_key, data, hashfunc=sha256, curve=curve.P256):
+def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, options={}):
     priv_key_int = int(priv_key, 16)
     priv_key_obj = ECPrivateKey(priv_key_int, curve)
     signer = ECDSA()
-    return signer.sign(data.encode(), priv_key_obj).hex()
+    while True:
+        signature = signer.sign(data.encode(), priv_key_obj).hex()
+        if not options.get('no_odd_total_len', False) \
+        or int(signature[2:4], 16) %2 == 0:
+            return signature 
 

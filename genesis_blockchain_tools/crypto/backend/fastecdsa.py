@@ -23,12 +23,15 @@ def gen_keypair(curve=curve.P256):
     pub_key = keys.get_public_key(priv_key, curve=curve)
     return format(priv_key, 'x'), point_to_hex_str(pub_key)
 
-
-def sign(priv_key, data, hashfunc=sha256, curve=curve.P256):
-    r, s = ecdsa.sign(data, int(priv_key, 16), hashfunc=hashfunc)
-    r, s = format(r, 'x'), format(s, 'x')
-    r_len = format(len(r) // 2, 'x')
-    s_len = format(len(s) // 2, 'x')
-    total_len = format((len(r) // 2) + (len(s) // 2) + 4, 'x')
-    return '30' + total_len + '02' + r_len + r + '02' + s_len + s
+def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, options={}):
+    while True:
+        r, s = ecdsa.sign(data, int(priv_key, 16), hashfunc=hashfunc)
+        r, s = format(r, 'x'), format(s, 'x')
+        r_len = format(len(r) // 2, 'x')
+        s_len = format(len(s) // 2, 'x')
+        total_len = format((len(r) // 2) + (len(s) // 2) + 4, 'x')
+        signature = '30' + total_len + '02' + r_len + r + '02' + s_len + s
+        if not options.get('no_odd_total_len', False) \
+        or int(signature[2:4], 16) %2 == 0:
+            return signature 
 

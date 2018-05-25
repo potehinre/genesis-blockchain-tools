@@ -47,3 +47,19 @@ def test_sign():
     s_len = int('0x' + signature[2+2+2+2+r_len+2:2+2+2+2+r_len+2+2], 16) * 2
     s = signature[2+2+2+2+r_len+2+2:2+2+2+2+r_len+2+2+s_len]
     assert len(r) // 2  + len(s) // 2 + 4 == total_len
+
+def test_sign_no_off_total_len():
+    data = "Some test data"
+    priv_key, pub_key = gen_keypair()
+    found_odd = False
+    tries_num = 200
+    for i in range(1, tries_num):
+        signature = sign(priv_key, data, options={'no_odd_total_len': False}) 
+        if int(signature[2:4], 16) % 2 != 0:
+            print("FOUND ODD")
+            found_odd = True
+            break
+    assert found_odd == True
+    for i in range(1, tries_num):
+        signature = sign(priv_key, data, options={'no_odd_total_len': True}) 
+        assert int(signature[2:4], 16) % 2 == 0

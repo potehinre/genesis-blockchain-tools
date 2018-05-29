@@ -2,6 +2,8 @@ from fastecdsa import keys, curve, ecdsa
 from fastecdsa.point import Point
 from hashlib import sha256
 
+from ..formatters import encode_sig
+
 
 def point_to_hex_str(key):
     return format(key.x, 'x') + format(key.y, 'x')
@@ -23,15 +25,30 @@ def gen_keypair(curve=curve.P256):
     pub_key = keys.get_public_key(priv_key, curve=curve)
     return format(priv_key, 'x'), point_to_hex_str(pub_key)
 
-def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, options={}):
-    while True:
-        r, s = ecdsa.sign(data, int(priv_key, 16), hashfunc=hashfunc)
-        r, s = format(r, 'x'), format(s, 'x')
-        r_len = format(len(r) // 2, 'x')
-        s_len = format(len(s) // 2, 'x')
-        total_len = format((len(r) // 2) + (len(s) // 2) + 4, 'x')
-        signature = '30' + total_len + '02' + r_len + r + '02' + s_len + s
-        if not options.get('no_odd_total_len', False) \
-        or int(signature[2:4], 16) %2 == 0:
-            return signature 
+def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, sign_fmt='DER',
+         sign_size=64):
+    print("FASTECDSA SIGN sign_fmt: %s" % sign_fmt)
+    r, s = ecdsa.sign(data, int(priv_key, 16), hashfunc=hashfunc)
+    signature = encode_sig(r, s, fmt=sign_fmt, size=sign_size).hex()
+    return signature
+    #r, s = format(r, 'x'), format(s, 'x')
+    #print("r: %s s: %s" % (r, s))
+    #r_len = format(len(r) // 2, 'x')
+    #s_len = format(len(s) // 2, 'x')
+    #total_len = format((len(r) // 2) + (len(s) // 2) + 4, 'x')
+    #signature = '30' + total_len + '02' + r_len + r + '02' + s_len + s
+    #if not options.get('no_odd_total_len', False) \
+    #or int(signature[2:4], 16) %2 == 0:
+    #    return signature 
+    #while True:
+    #    r, s = ecdsa.sign(data, int(priv_key, 16), hashfunc=hashfunc)
+    #    r, s = format(r, 'x'), format(s, 'x')
+    #    print("r: %s s: %s" % (r, s))
+    #    r_len = format(len(r) // 2, 'x')
+    #    s_len = format(len(s) // 2, 'x')
+    #    total_len = format((len(r) // 2) + (len(s) // 2) + 4, 'x')
+    #    signature = '30' + total_len + '02' + r_len + r + '02' + s_len + s
+    #    if not options.get('no_odd_total_len', False) \
+    #    or int(signature[2:4], 16) %2 == 0:
+    #        return signature 
 

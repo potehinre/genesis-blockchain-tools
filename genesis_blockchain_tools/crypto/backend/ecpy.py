@@ -6,6 +6,8 @@ from ecpy.curves import Curve, Point
 from ecpy.keys import ECPublicKey, ECPrivateKey
 from ecpy.ecdsa import ECDSA
 
+from ..formatters import encode_sig
+
 class CurveByAttrName:
     @property
     def P256(self):
@@ -63,13 +65,59 @@ def gen_keypair(curve=curve.P256):
     pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
     return format(priv_key, 'x'), point_to_hex_str(pub_key_obj)
 
-def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, options={}):
+
+class ECDSAWithSize(ECDSA):
+    def __init__(self, *args, **kwargs):
+        self.size = kwargs.pop('size', 64)
+        super(ECDSAWithSize, self).__init__(*args, **kwargs)
+
+    def _do_sign(self, msg, pv_key, k, canonical=False):
+        if (pv_key.curve == None):
+            raise ECPyException('private key haz no curve')
+        curve = pv_key.curve
+        n = curve.order
+        G = curve.generator
+        k = k%n
+
+        msg = int.from_bytes(msg, 'big')
+        
+        Q = G*k
+        kinv = pow(k,n-2,n)
+        r = Q.x % n
+        if r == 0:
+            return None
+
+        s = (kinv*(msg+pv_key.d*r)) %n
+        if s == 0:
+            return None
+
+        if canonical and (s > (n//2)):
+            s = n-s
+        
+        sig = encode_sig(r, s, fmt=self.fmt, size=self.size)
+        
+        # r = r.to_bytes((r.bit_length()+7)//8, 'big')
+        # s = s.to_bytes((s.bit_length()+7)//8, 'big')
+        # if (r[0] & 0x80) == 0x80 :
+        #     r = b'\0'+r
+        # if (s[0] & 0x80) == 0x80 :
+        #     s = b'\0'+s
+        # sig = (b'\x30'+int((len(r)+len(s)+4)).to_bytes(1,'big') +
+        #        b'\x02'+int(len(r)).to_bytes(1,'big') + r        +
+        #        b'\x02'+int(len(s)).to_bytes(1,'big') + s      )
+        return sig
+
+def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, sign_fmt='DER', 
+         sign_size=32):
+    print("ECPY SIGN sign_fmt: %s sign_size: %s" % (sign_fmt, sign_size))
     priv_key_int = int(priv_key, 16)
     priv_key_obj = ECPrivateKey(priv_key_int, curve)
-    signer = ECDSA()
-    while True:
-        signature = signer.sign(data.encode(), priv_key_obj).hex()
-        if not options.get('no_odd_total_len', False) \
-        or int(signature[2:4], 16) %2 == 0:
-            return signature 
+    signer = ECDSAWithSize(fmt=sign_fmt, size=sign_size)
+    signature = signer.sign(data.encode(), priv_key_obj).hex()
+    return signature
+    #while True:
+    #    signature = signer.sign(data.encode(), priv_key_obj).hex()
+    #    if not options.get('no_odd_total_len', False) \
+    #    or int(signature[2:4], 16) %2 == 0:
+    #        return signature 
 

@@ -7,6 +7,12 @@ except ModuleNotFoundError as e:
     pass
 
 try:
+    import ecdsa
+    found_module = 'ecdsa'
+except ModuleNotFoundError as e:
+    pass
+
+try:
     import ecpy
     found_module = 'ecpy'
 except ModuleNotFoundError as e:
@@ -20,6 +26,13 @@ except ModuleNotFoundError as e:
 
 if found_module == 'fastecdsa':
     from .fastecdsa import (
+        gen_private_key,
+        get_public_key,
+        gen_keypair,
+        sign,
+    )
+elif found_module == 'ecdsa':
+    from .ecdsa import (
         gen_private_key,
         get_public_key,
         gen_keypair,
@@ -40,7 +53,7 @@ elif found_module == 'rubenesque':
         sign,
     )
 else:
-    raise ModuleNotFoundError("None of fastecdsa, ecpy or rubenesque ECSDA modules found")
+    raise ModuleNotFoundError("None of fastecdsa, ecdsa, ecpy or rubenesque ECDSA modules found")
 
 class Error(Exception):
     pass

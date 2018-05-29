@@ -10,7 +10,7 @@ with open(os.path.join(here, 'README.md')) as f:
 
 requires = [
     'pytest',
-    'ECPy',
+    'ecdsa',
 ]
 
 setup(

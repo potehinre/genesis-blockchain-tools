@@ -6,10 +6,19 @@ Setup
 
 ## Prerequisites:
 
-Currenty three cryptographic backend modules are supported:
+Currenty four cryptographic backend modules are supported:
+* [python-ecdsa](https://github.com/warner/python-ecdsa)
 * [ECPy](http://ubinity.github.io/ECPy/)
 * [fastecdsa](https://github.com/AntonKueltz/fastecdsa)
 * [rubenesque](https://github.com/latchset/python-rubenesque)
+
+### Setting up python-ecdsa
+
+python-ecdsa is pure python implementation of ECDSA. Use this module if you have issues with dependencies installation (on Windows for exapmle):
+
+```
+pip install ecdsa
+```
 
 ### Setting up ECPy
 

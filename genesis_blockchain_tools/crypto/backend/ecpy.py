@@ -96,28 +96,13 @@ class ECDSAWithSize(ECDSA):
         
         sig = encode_sig(r, s, fmt=self.fmt, size=self.size)
         
-        # r = r.to_bytes((r.bit_length()+7)//8, 'big')
-        # s = s.to_bytes((s.bit_length()+7)//8, 'big')
-        # if (r[0] & 0x80) == 0x80 :
-        #     r = b'\0'+r
-        # if (s[0] & 0x80) == 0x80 :
-        #     s = b'\0'+s
-        # sig = (b'\x30'+int((len(r)+len(s)+4)).to_bytes(1,'big') +
-        #        b'\x02'+int(len(r)).to_bytes(1,'big') + r        +
-        #        b'\x02'+int(len(s)).to_bytes(1,'big') + s      )
         return sig
 
 def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, sign_fmt='DER', 
          sign_size=32):
-    print("ECPY SIGN sign_fmt: %s sign_size: %s" % (sign_fmt, sign_size))
     priv_key_int = int(priv_key, 16)
     priv_key_obj = ECPrivateKey(priv_key_int, curve)
     signer = ECDSAWithSize(fmt=sign_fmt, size=sign_size)
     signature = signer.sign(data.encode(), priv_key_obj).hex()
     return signature
-    #while True:
-    #    signature = signer.sign(data.encode(), priv_key_obj).hex()
-    #    if not options.get('no_odd_total_len', False) \
-    #    or int(signature[2:4], 16) %2 == 0:
-    #        return signature 
 

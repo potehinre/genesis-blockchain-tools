@@ -26,7 +26,6 @@ def gen_keypair(curve=curve.P256, hashfunc=sha256):
 
 def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, sign_fmt='DER', 
          sign_size=32):
-    print("ECDSA SIGN sign_fmt: %s sign_size: %s" % (sign_fmt, sign_size))
     data = data.encode()
     priv_key = bytes.fromhex(priv_key)
     priv_key = SigningKey.from_string(priv_key, curve=curve, hashfunc=hashfunc)

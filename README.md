@@ -30,7 +30,7 @@ pip install ECPy
 
 ### Setting up fastecdsa
 
-fastecdsa is C/C++ module. It's the fastest between two others. Use this module if you have no issues with dependencies (on Debian/Ubuntu Linux for example):
+fastecdsa is C/C++ module. It's the fastest between others. Use this module if you have no issues with dependencies (on Debian/Ubuntu Linux for example):
 
 ```
 pip install fastecdsa

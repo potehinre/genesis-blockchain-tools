@@ -3,25 +3,25 @@ found_module = None
 try:
     import fastecdsa
     found_module = 'fastecdsa'
-except ModuleNotFoundError as e:
+except ImportError:
     pass
 
 try:
     import ecdsa
     found_module = 'ecdsa'
-except ModuleNotFoundError as e:
+except ImportError:
     pass
 
 try:
     import ecpy
     found_module = 'ecpy'
-except ModuleNotFoundError as e:
+except ImportError:
     pass
 
 try:
     import rubenesque
     found_module = 'rubenesque'
-except ModuleNotFoundError as e:
+except ImportError:
     pass
 
 if found_module == 'fastecdsa':
@@ -53,8 +53,4 @@ elif found_module == 'rubenesque':
         sign,
     )
 else:
-    raise ModuleNotFoundError("None of fastecdsa, ecdsa, ecpy or rubenesque ECDSA modules found")
-
-class Error(Exception):
-    pass
-
+    raise ImportError("None of fastecdsa, ecdsa, ecpy or rubenesque ECDSA modules found")

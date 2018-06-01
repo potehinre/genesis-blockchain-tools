@@ -55,4 +55,5 @@ def import_first_available_backend_namespace():
 if __name__ == '__main__':
     pass
 else:
+    backend_name = get_first_available_backend_name()
     import_first_available_backend_namespace()

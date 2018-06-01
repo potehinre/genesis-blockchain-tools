@@ -15,17 +15,14 @@ curve = CurveByAttrName()
 def point_to_hex_str(key):
     return format(key.x, 'x') + format(key.y, 'x')
 
-
 def gen_private_key(curve=curve.P256):
     priv_key = curve.private_key()
     return format(priv_key, 'x')
-
 
 def get_public_key(priv_key, curve=curve.P256):
     priv_key = int(priv_key, 16)
     pub_key_obj = curve.generator() * priv_key
     return point_to_hex_str(pub_key_obj)
-
 
 def gen_keypair(curve=curve.P256):
     priv_key = gen_private_key(curve=curve)

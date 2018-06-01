@@ -15,6 +15,38 @@ class CurveByAttrName:
 
 curve = CurveByAttrName()
 
+class ECDSAWithSize(ECDSA):
+    def __init__(self, *args, **kwargs):
+        self.size = kwargs.pop('size', 64)
+        super(ECDSAWithSize, self).__init__(*args, **kwargs)
+
+    def _do_sign(self, msg, pv_key, k, canonical=False):
+        if (pv_key.curve == None):
+            raise ECPyException('private key haz no curve')
+        curve = pv_key.curve
+        n = curve.order
+        G = curve.generator
+        k = k%n
+
+        msg = int.from_bytes(msg, 'big')
+        
+        Q = G*k
+        kinv = pow(k,n-2,n)
+        r = Q.x % n
+        if r == 0:
+            return None
+
+        s = (kinv*(msg+pv_key.d*r)) %n
+        if s == 0:
+            return None
+
+        if canonical and (s > (n//2)):
+            s = n-s
+        
+        sig = encode_sig(r, s, fmt=self.fmt, size=self.size)
+        
+        return sig
+
 def point_to_hex_str(key):
     return format(key.W.x, 'x') + format(key.W.y, 'x')
 
@@ -64,39 +96,6 @@ def gen_keypair(curve=curve.P256):
     priv_key = _gen_private_key(curve)
     pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
     return format(priv_key, 'x'), point_to_hex_str(pub_key_obj)
-
-
-class ECDSAWithSize(ECDSA):
-    def __init__(self, *args, **kwargs):
-        self.size = kwargs.pop('size', 64)
-        super(ECDSAWithSize, self).__init__(*args, **kwargs)
-
-    def _do_sign(self, msg, pv_key, k, canonical=False):
-        if (pv_key.curve == None):
-            raise ECPyException('private key haz no curve')
-        curve = pv_key.curve
-        n = curve.order
-        G = curve.generator
-        k = k%n
-
-        msg = int.from_bytes(msg, 'big')
-        
-        Q = G*k
-        kinv = pow(k,n-2,n)
-        r = Q.x % n
-        if r == 0:
-            return None
-
-        s = (kinv*(msg+pv_key.d*r)) %n
-        if s == 0:
-            return None
-
-        if canonical and (s > (n//2)):
-            s = n-s
-        
-        sig = encode_sig(r, s, fmt=self.fmt, size=self.size)
-        
-        return sig
 
 def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, sign_fmt='DER', 
          sign_size=32):

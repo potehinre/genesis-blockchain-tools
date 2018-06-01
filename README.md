@@ -87,4 +87,4 @@ signature = sign(priv_key, data)
 Requirements
 ------------
 
-Tested on Python 3 but should work on Python 2 also.
+Tested on Python 3.x only yet

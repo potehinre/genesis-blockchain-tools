@@ -1,3 +1,19 @@
+import imp
+import os
+
+__BACKEND_NAMES = ('fastecdsa', 'ecdsa', 'ecpy', 'rubenesque')
+
+def import_crypto_by_backend(name):
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    if not name in __BACKEND_NAMES:
+        raise ImportError("%s crypto backend isn't available" % name)
+    path = basedir
+    l = []
+    for i in range(0, 3):
+        path, part = os.path.split(path)
+        l.insert(0, part)
+    return imp.load_source('.'.join(l), os.path.join(basedir, name + '.py'))
+
 found_module = None
 
 try:
@@ -53,4 +69,4 @@ elif found_module == 'rubenesque':
         sign,
     )
 else:
-    raise ImportError("None of fastecdsa, ecdsa, ecpy or rubenesque ECDSA modules found")
+    raise ImportError("None of %s ECDSA modules found" % ', '.join(__BACKEND_NAMES))

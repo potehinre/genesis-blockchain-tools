@@ -5,6 +5,8 @@ from hashlib import sha256
 
 from ..formatters import encode_sig
 
+backend_name = 'rubenesque'
+
 class CurveByAttrName:
     @property
     def P256(self):

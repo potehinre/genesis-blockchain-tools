@@ -3,6 +3,8 @@ from ecdsa.util import sigencode_der
 
 from hashlib import sha256
 
+backend_name = 'ecdsa'
+
 class CurveByAttrName:
     @property
     def P256(self):

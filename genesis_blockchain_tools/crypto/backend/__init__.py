@@ -3,7 +3,8 @@ import os
 import sys
 
 __BACKEND_NAMES = ('fastecdsa', 'ecdsa', 'ecpy', 'rubenesque')
-__EXPORTED_NAMES = ('gen_private_key', 'get_public_key', 'gen_keypair', 'sign')
+__EXPORTED_NAMES = ('gen_private_key', 'get_public_key', 'gen_keypair', 'sign',
+                    'backend_name')
 
 def import_crypto_by_backend(name):
     basedir = os.path.abspath(os.path.dirname(__file__))

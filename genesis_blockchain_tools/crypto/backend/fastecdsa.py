@@ -4,6 +4,8 @@ from hashlib import sha256
 
 from ..formatters import encode_sig
 
+backend_name = 'fastecdsa'
+
 def point_to_hex_str(key):
     return format(key.x, 'x') + format(key.y, 'x')
 

@@ -8,6 +8,8 @@ from ecpy.ecdsa import ECDSA
 
 from ..formatters import encode_sig
 
+backend_name = 'ecpy'
+
 class CurveByAttrName:
     @property
     def P256(self):

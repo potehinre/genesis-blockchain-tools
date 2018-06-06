@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+class Error(Exception):
+    pass
+
 #python 2 compatibility
 from builtins import int,pow
 
@@ -58,14 +61,14 @@ def encode_sig(r,s,fmt="DER",size=0) :
     
     if fmt=="RAW":
         if size == 0:
-            raise ECPyException("size must be specified when encoding in RAW")
+            raise Error("size must be specified when encoding in RAW")
         r = r.to_bytes(size, 'big')
         s = s.to_bytes(size, 'big')
         return r+s
 
     if fmt=="EDDSA":
         if size == 0:
-            raise ECPyException("size must be specified when encoding in EDDSA")
+            raise Error("size must be specified when encoding in EDDSA")
         r = r.to_bytes(size, 'little')
         s = s.to_bytes(size, 'little')
         return r+s

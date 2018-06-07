@@ -36,8 +36,7 @@ def point_to_hex_str(key, fmt='RAW'):
 
 def gen_private_key(curve=curve.P256, hashfunc=sha256):
     priv_key = ec.generate_private_key(curve, backend)
-    #return int_to_hex_str(priv_key.private_numbers().private_value)
-    return "ac3877a3b66584ecce9ab3ab661d85aa04006cb54ca6401a3845d0cfefc97d16"
+    return int_to_hex_str(priv_key.private_numbers().private_value)
 
 def get_public_key(priv_key, curve=curve.P256, hashfunc=sha256, fmt='RAW'):
     if fmt in ['RAW', '04']:

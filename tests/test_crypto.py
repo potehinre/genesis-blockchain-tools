@@ -11,8 +11,9 @@ from genesis_blockchain_tools.crypto.formatters import (
 
 from .utils import gen_rand_str
 
-crypto = import_crypto_by_backend('cryptography')
-#crypto = import_crypto_by_backend('fastecdsa')
+#crypto = import_crypto_by_backend('cryptography')
+crypto = import_crypto_by_backend('fastecdsa')
+print("crypto.backend_name: %s" % crypto.backend_name)
 
 def test_gen_private_key():
     priv_key = crypto.gen_private_key()

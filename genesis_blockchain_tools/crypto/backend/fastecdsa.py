@@ -33,7 +33,7 @@ def get_public_key(priv_key, curve=curve.P256, hashfunc=sha256, fmt='RAW'):
         pub_key = keys.get_public_key(priv_key, curve=curve)
         return point_to_hex_str(pub_key, fmt=fmt)
     else:
-        raise UnknownPointFormatError("fmt: '%s'" % fmt)
+        raise UnknownPublicKeyFormatError("fmt: '%s'" % fmt)
 
 def gen_keypair(curve=curve.P256, hashfunc=sha256, pub_key_fmt='RAW'):
     if pub_key_fmt in ['RAW', '04']:

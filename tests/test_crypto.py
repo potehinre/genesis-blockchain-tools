@@ -12,7 +12,8 @@ from genesis_blockchain_tools.crypto.formatters import (
 from .utils import gen_rand_str
 
 #crypto = import_crypto_by_backend('cryptography')
-crypto = import_crypto_by_backend('fastecdsa')
+#crypto = import_crypto_by_backend('fastecdsa')
+crypto = import_crypto_by_backend('ecdsa')
 print("crypto.backend_name: %s" % crypto.backend_name)
 
 def test_gen_private_key():
@@ -55,8 +56,9 @@ def test_gen_keypair():
 
 def test_sign():
     data = "Another test data"
-    tries = 20
+    tries = 3 #20
     for i in range(1, tries):
+        print("test sign i: %s" % i)
         priv_key, pub_key = crypto.gen_keypair()
 
         signature = crypto.sign(priv_key, data)
@@ -72,8 +74,9 @@ def test_sign():
 
 def test_verify():
     data = "More test data, ID: " + gen_rand_str()
-    tries = 20
+    tries = 3 #20
     for i in range(1, tries):
+        print("test verify i: %s" % i)
         priv_key, pub_key = crypto.gen_keypair()
         signature = crypto.sign(priv_key, data)
         assert crypto.verify(pub_key, data, signature) == True

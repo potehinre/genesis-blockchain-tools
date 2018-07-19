@@ -44,7 +44,7 @@ def get_public_key(priv_key, curve=curve.P256, hashfunc=sha256, fmt='RAW'):
         priv_key = ec.derive_private_key(priv_key, curve, backend)
         return point_to_hex_str(priv_key.public_key().public_numbers(), fmt=fmt)
     else:
-        raise UnknownPointFormatError("fmt: '%s'" % fmt)
+        raise UnknownPublicKeyFormatError("fmt: '%s'" % fmt)
 
 def gen_keypair(curve=curve.P256, hashfunc=sha256, pub_key_fmt='RAW'):
     priv_key = ec.generate_private_key(curve, backend)

@@ -56,9 +56,8 @@ def test_gen_keypair():
 
 def test_sign():
     data = "Another test data"
-    tries = 3 #20
+    tries = 5
     for i in range(1, tries):
-        print("test sign i: %s" % i)
         priv_key, pub_key = crypto.gen_keypair()
 
         signature = crypto.sign(priv_key, data)
@@ -74,9 +73,8 @@ def test_sign():
 
 def test_verify():
     data = "More test data, ID: " + gen_rand_str()
-    tries = 3 #20
+    tries = 5
     for i in range(1, tries):
-        print("test verify i: %s" % i)
         priv_key, pub_key = crypto.gen_keypair()
         signature = crypto.sign(priv_key, data)
         assert crypto.verify(pub_key, data, signature) == True

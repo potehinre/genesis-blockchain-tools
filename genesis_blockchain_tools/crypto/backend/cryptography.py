@@ -8,6 +8,7 @@ from cryptography.exceptions import InvalidSignature
 
 from ..formatters import encode_sig, decode_sig
 from ...convert import int_to_hex_str
+from .common import point_to_hex_str
 from .errors import (
     UnknownPointFormatError, UnknownSignatureFormatError,
     UnknownPublicKeyFormatError
@@ -24,15 +25,6 @@ class CurveByAttrName:
 
 curve = CurveByAttrName()
 sha256 = hashes.SHA256()
-
-def point_to_hex_str(key, fmt='RAW'):
-    hex_str = int_to_hex_str(key.x) + int_to_hex_str(key.y)
-    if fmt == 'RAW':
-        return hex_str
-    elif fmt == '04':
-        return '04' + hex_str
-    else:
-        raise UnknownPointFormatError("fmt: '%s'" % fmt)
 
 def gen_private_key(curve=curve.P256, hashfunc=sha256):
     priv_key = ec.generate_private_key(curve, backend)

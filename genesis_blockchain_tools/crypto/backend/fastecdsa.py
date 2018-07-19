@@ -4,24 +4,13 @@ from hashlib import sha256
 
 from ..formatters import encode_sig, decode_sig
 from ...convert import int_to_hex_str
+from .common import point_to_hex_str, split_str_to_halves
 from .errors import (
     UnknownPointFormatError, UnknownPublicKeyFormatError, 
     UnknownSignatureFormatError
 )
 
 backend_name = 'fastecdsa'
-
-def split_str_to_halves(s):
-    return s[0:len(s)//2], s[len(s)//2 if len(s)%2 == 0 else ((len(s)//2)+1):]
-
-def point_to_hex_str(key, fmt='RAW'):
-    hex_str = int_to_hex_str(key.x) + int_to_hex_str(key.y)
-    if fmt == 'RAW':
-        return hex_str
-    elif fmt == '04':
-        return '04' + hex_str
-    else:
-        raise UnknownPointFormatError("fmt: '%s'" % fmt)
 
 def gen_private_key(curve=curve.P256, hashfunc=sha256):
     priv_key = keys.gen_private_key(curve)

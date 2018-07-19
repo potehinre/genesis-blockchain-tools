@@ -1,4 +1,5 @@
 from ecdsa import SigningKey, VerifyingKey, NIST256p
+from ecdsa.keys import BadSignatureError
 from ecdsa.util import sigencode_der
 
 from hashlib import sha256
@@ -67,20 +68,16 @@ def verify(pub_key, data, signature, hashfunc=sha256, curve=curve.P256,
     else:
         raise UnknownPublicKeyFormatError("fmt: '%s'" % pub_key_fmt)
 
-    #if sign_fmt == 'DER':
-    #    signature = bytes.fromhex(signature)
-    #elif sign_fmt == 'RAW':
-    #    r, s = decode_sig(bytes.fromhex(signature), fmt="RAW")
-    #    signature = encode_sig(r, s, fmt=sign_fmt, size=sign_size)
-    #else:
-    #    raise UnknownSignatureFormatError("fmt: '%s'" % sign_fmt)
     if sign_fmt in ['RAW', 'DER']:
         r, s = decode_sig(bytes.fromhex(signature), fmt=sign_fmt)
         signature = encode_sig(r, s, fmt='RAW', size=sign_size)
     else:
         raise UnknownSignatureFormatError("fmt: '%s'" % sign_fmt)
-    print("signature: %s" % signature)
 
     vk = VerifyingKey.from_string(bytes.fromhex(pub_key_encoded), curve=curve,
                                   hashfunc=hashfunc)
-    return vk.verify(signature, data_bytes)
+    try:
+        vk.verify(signature, data_bytes)
+        return True
+    except BadSignatureError:
+        return False

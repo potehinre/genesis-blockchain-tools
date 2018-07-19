@@ -2,7 +2,7 @@ import imp
 import os
 import sys
 
-__BACKEND_NAMES = ('fastecdsa', 'ecdsa', 'ecpy', 'rubenesque', 'cryptography')
+__BACKEND_NAMES = ('fastecdsa', 'cryptography', 'ecdsa', 'ecpy', 'rubenesque')
 __EXPORTED_NAMES = ('gen_private_key', 'get_public_key', 'gen_keypair', 'sign',
                     'backend_name')
 

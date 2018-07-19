@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup, find_packages
 
-__VERSION__ = '0.1.4'
+__VERSION__ = '0.1.5'
 
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.md')) as f:
@@ -10,7 +10,7 @@ with open(os.path.join(here, 'README.md')) as f:
 
 requires = [
     'pytest',
-    'ecdsa',
+    'cryptography',
 ]
 
 setup(

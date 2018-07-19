@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.exceptions import InvalidSignature
 
 from ..formatters import encode_sig, decode_sig
-from ...convert import fill_from_left
+from ...convert import int_to_hex_str
 
 logger = logging.getLogger(__name__)
 backend_name = 'cryptography'
@@ -20,9 +20,6 @@ class CurveByAttrName:
 
 curve = CurveByAttrName()
 sha256 = hashes.SHA256()
-
-def int_to_hex_str(value, exp_len=64):
-    return fill_from_left(format(value, 'x'), exp_len=exp_len, filler='0')
 
 def point_to_hex_str(key, fmt='RAW'):
     hex_str = int_to_hex_str(key.x) + int_to_hex_str(key.y)

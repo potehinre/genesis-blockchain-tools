@@ -71,7 +71,7 @@ def verify(pub_key, data, signature, hashfunc=sha256, curve=curve.P256,
         signature = bytes.fromhex(signature)
     elif sign_fmt == 'RAW':
         r, s = decode_sig(bytes.fromhex(signature), fmt="RAW")
-        signature = encode_sig(r, s, fmt=sign_fmt, size=sign_size)
+        signature = encode_sig(r, s, fmt='DER', size=sign_size)
     else:
         raise UnknownSignatureFormatError("fmt: '%s'" % sign_fmt)
 

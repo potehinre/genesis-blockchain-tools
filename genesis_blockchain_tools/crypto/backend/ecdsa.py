@@ -64,7 +64,7 @@ def verify(pub_key, data, signature, hashfunc=sha256, curve=curve.P256,
     if pub_key_fmt == 'RAW':
         pub_key_encoded = pub_key
     elif pub_key_fmt == '04':
-        pub_key_encoded = pub_key[2:0]
+        pub_key_encoded = pub_key[2:]
     else:
         raise UnknownPublicKeyFormatError("fmt: '%s'" % pub_key_fmt)
 

@@ -8,9 +8,20 @@ from genesis_blockchain_tools.crypto.formatters import (
     encode_sig, decode_sig
 )
 
-from .utils import gen_rand_str
+from .utils import (
+    gen_rand_str, get_rand_pub_key_fmt, get_rand_sign_fmt, get_rand_sign_fmt
+)
 
-crypto_backends = [import_crypto_by_backend(backend_name) for backend_name in get_available_backend_names()]
+crypto_backends = []
+backends_excludes = []
+for backend_name in get_available_backend_names():
+    if backend_name not in backends_excludes:
+        crypto_backends.append(import_crypto_by_backend(backend_name))
+print("crypto_backends: %s" % ([c.backend_name for c in crypto_backends]))
+
+def get_rand_backend():
+    assert crypto_backends
+    return random.choice(crypto_backends)
 
 def _test_gen_private_key(crypto):
     priv_key = crypto.gen_private_key()
@@ -103,6 +114,37 @@ def _test_verify(crypto):
         signature = crypto.sign(priv_key, data)
         assert crypto.verify(pub_key, data, signature) == True
         assert crypto.verify(pub_key, data + gen_rand_str(), signature) == False
+
+        priv_key, pub_key = crypto.gen_keypair()
+        signature = crypto.sign(priv_key, data, sign_fmt='RAW')
+        assert crypto.verify(pub_key, data, signature, sign_fmt='RAW') == True
+        assert crypto.verify(pub_key, data + gen_rand_str(), signature, sign_fmt='RAW') == False
+
+        priv_key, pub_key = crypto.gen_keypair(pub_key_fmt='04')
+        signature = crypto.sign(priv_key, data, sign_fmt='RAW')
+        assert crypto.verify(pub_key, data, signature, sign_fmt='RAW', pub_key_fmt='04') == True
+        assert crypto.verify(pub_key, data + gen_rand_str(), signature, sign_fmt='RAW', pub_key_fmt='04') == False
+
+        priv_key, pub_key = crypto.gen_keypair(pub_key_fmt='RAW')
+        signature = crypto.sign(priv_key, data, sign_fmt='RAW')
+        assert crypto.verify(pub_key, data, signature, sign_fmt='RAW', pub_key_fmt='RAW') == True
+        assert crypto.verify(pub_key, data + gen_rand_str(), signature, sign_fmt='RAW', pub_key_fmt='RAW') == False
+
+
+        priv_key, pub_key = crypto.gen_keypair()
+        signature = crypto.sign(priv_key, data, sign_fmt='DER')
+        assert crypto.verify(pub_key, data, signature, sign_fmt='DER') == True
+        assert crypto.verify(pub_key, data + gen_rand_str(), signature, sign_fmt='DER') == False
+
+        priv_key, pub_key = crypto.gen_keypair(pub_key_fmt='RAW')
+        signature = crypto.sign(priv_key, data, sign_fmt='DER')
+        assert crypto.verify(pub_key, data, signature, sign_fmt='DER', pub_key_fmt='RAW') == True
+        assert crypto.verify(pub_key, data + gen_rand_str(), signature, sign_fmt='DER', pub_key_fmt='RAW') == False
+
+        priv_key, pub_key = crypto.gen_keypair(pub_key_fmt='04')
+        signature = crypto.sign(priv_key, data, sign_fmt='DER')
+        assert crypto.verify(pub_key, data, signature, sign_fmt='DER', pub_key_fmt='04') == True
+        assert crypto.verify(pub_key, data + gen_rand_str(), signature, sign_fmt='DER', pub_key_fmt='04') == False
 
 def test_verify():
     assert crypto_backends

@@ -25,7 +25,7 @@ def get_rand_backend():
     assert crypto_backends
     return random.choice(crypto_backends)
 
-def _test_get_public_key():
+def test_get_public_key():
     assert crypto_backends
     priv_pub_keys = (
 
@@ -64,7 +64,7 @@ def _test_get_public_key():
             kwargs = {'fmt': fmt} if fmt else {}
             assert crypto.get_public_key(priv_key, **kwargs) == e_pub_key
 
-def _test_gen_keypair_get_public_key():
+def test_gen_keypair_get_public_key():
     assert crypto_backends
     tries = 3
     for i in range(1, tries):

@@ -6,7 +6,14 @@ from ecpy.curves import Curve, Point
 from ecpy.keys import ECPublicKey, ECPrivateKey
 from ecpy.ecdsa import ECDSA
 
-from ..formatters import encode_sig
+from ..formatters import encode_sig, decode_sig
+from ...convert import int_to_hex_str
+from .common import point_to_hex_str, split_str_to_halves
+from .errors import (
+    UnknownPointFormatError, UnknownSignatureFormatError,
+    UnknownPublicKeyFormatError
+)
+
 
 backend_name = 'ecpy'
 
@@ -19,8 +26,9 @@ curve = CurveByAttrName()
 
 class ECDSAWithSize(ECDSA):
     def __init__(self, *args, **kwargs):
-        self.size = kwargs.pop('size', 64)
+        size = kwargs.pop('size', 64)
         super(ECDSAWithSize, self).__init__(*args, **kwargs)
+        self.size = size
 
     def _do_sign(self, msg, pv_key, k, canonical=False):
         if (pv_key.curve == None):
@@ -48,9 +56,6 @@ class ECDSAWithSize(ECDSA):
         sig = encode_sig(r, s, fmt=self.fmt, size=self.size)
         
         return sig
-
-def point_to_hex_str(key):
-    return format(key.W.x, 'x') + format(key.W.y, 'x')
 
 def _gen_private_key(curve):
     """Generate a private key to sign data with.
@@ -87,23 +92,57 @@ def _gen_private_key(curve):
 
 def gen_private_key(curve=curve.P256):
     priv_key = _gen_private_key(curve)
-    return format(priv_key, 'x')
+    return int_to_hex_str(priv_key)
 
-def get_public_key(priv_key, curve=curve.P256):
-    priv_key = int(priv_key, 16)
-    pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
-    return point_to_hex_str(pub_key_obj)
+def get_public_key(priv_key, curve=curve.P256, hashfunc=sha256, fmt='RAW'):
+    if fmt in ['RAW', '04']:
+        priv_key = int(priv_key, 16)
+        pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
+        return point_to_hex_str(pub_key_obj.W, fmt=fmt)
+    else:
+        raise UnknownPublicKeyFormatError("fmt: '%s'" % fmt)
 
-def gen_keypair(curve=curve.P256):
-    priv_key = _gen_private_key(curve)
-    pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
-    return format(priv_key, 'x'), point_to_hex_str(pub_key_obj)
+def gen_keypair(curve=curve.P256, hashfunc=sha256, pub_key_fmt='RAW'):
+    if pub_key_fmt in ['RAW', '04']:
+        priv_key = _gen_private_key(curve)
+        pub_key_obj = ECPrivateKey(priv_key, curve).get_public_key()
+        return int_to_hex_str(priv_key), point_to_hex_str(pub_key_obj.W, 
+                                                          fmt=pub_key_fmt)
+    else:
+        raise UnknownPublicKeyFormatError("fmt: '%s'" % fmt)
 
 def sign(priv_key, data, hashfunc=sha256, curve=curve.P256, sign_fmt='DER', 
          sign_size=32):
     priv_key_int = int(priv_key, 16)
     priv_key_obj = ECPrivateKey(priv_key_int, curve)
+    if sign_fmt in ['RAW', 'DER']:
+        pass
+    else:
+        raise UnknownSignatureFormatError("fmt: '%s'" % sign_fmt)
     signer = ECDSAWithSize(fmt=sign_fmt, size=sign_size)
-    signature = signer.sign(data.encode(), priv_key_obj).hex()
+    msg = hashfunc(data.encode()).digest()
+    signature = signer.sign(msg, priv_key_obj).hex()
     return signature
+
+def verify(pub_key, data, signature, hashfunc=sha256, curve=curve.P256,
+           sign_fmt='DER', sign_size=32, pub_key_fmt='RAW'):
+    if sign_fmt in ['RAW', 'DER']:
+        pass
+    else:
+        raise UnknownSignatureFormatError("fmt: '%s'" % sign_fmt)
+
+    if pub_key_fmt == 'RAW':
+        pub_key_encoded = pub_key
+    elif pub_key_fmt == '04':
+        pub_key_encoded = pub_key[2:]
+    else:
+        raise UnknownPublicKeyFormatError("fmt: '%s'" % pub_key_fmt)
+    x, y = split_str_to_halves(pub_key_encoded)
+    x, y = int(x, 16), int(y, 16)
+    pub_key_point = ECPublicKey(Point(x, y, curve))
+
+    signature = bytes.fromhex(signature)
+    signer = ECDSAWithSize(fmt=sign_fmt, size=sign_size)
+    msg = hashfunc(data.encode()).digest()
+    return signer.verify(msg, signature, pub_key_point)
 

@@ -6,15 +6,24 @@ Setup
 
 ## Prerequisites:
 
-Currenty four cryptographic backend modules are supported:
+Currenty five cryptographic backend modules are supported:
+* [cryptography](https://github.com/pyca/cryptography) (default, required)
 * [python-ecdsa](https://github.com/warner/python-ecdsa)
 * [ECPy](http://ubinity.github.io/ECPy/)
 * [fastecdsa](https://github.com/AntonKueltz/fastecdsa)
 * [rubenesque](https://github.com/latchset/python-rubenesque)
 
+### Setting up cryptography
+
+It's default and required module. Should be installed automaticaly. But you can install it manually nevertheless:
+
+```
+pip install cryptography
+```
+
 ### Setting up python-ecdsa
 
-python-ecdsa is pure python implementation of ECDSA. Use this module if you have issues with dependencies installation (on Windows for exapmle):
+python-ecdsa is pure python implementation of ECDSA. It's also the slowest. Use this module if you have issues with dependencies installation (on Windows for exapmle):
 
 ```
 pip install ecdsa

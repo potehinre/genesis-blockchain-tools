@@ -78,7 +78,7 @@ def test_gen_keypair_get_public_key():
                   gen_pub_key, get_pub_key))
             assert gen_pub_key == get_pub_key
 
-def test_gen_keypair_get_public_key():
+def test_gen_keypair_sign_verify():
     assert crypto_backends
     tries = 8
     for i in range(1, tries):

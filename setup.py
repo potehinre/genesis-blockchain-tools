@@ -11,6 +11,9 @@ with open(os.path.join(here, 'README.md')) as f:
 requires = [
     'pytest',
     'cryptography',
+    'crccheck',
+    'msgpack-pure',
+    'msgpack',
 ]
 
 setup(

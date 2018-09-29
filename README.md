@@ -100,7 +100,11 @@ from genesis_blockchain_tools.crypto import sign
 from genesis_blockchain_tools.contract import Contract
 
 priv_key = '2922bee6973370915cc63ab5ab8b7a57e1cab909477d7a030b2e4661e7aa2202'
-contract = Contract(schema=schema, private_key=priv_key, params={'Id': 2})
+# schema that was obtained as a result of the GET /api/v2/contract/EditPage query
+schema = {'id': 273, 'state': 1, 'active': False, 'tableid': '13', 'walletid': '-6097185355090423139', 'tokenid': '1', 'address': '1234-9558-7186-1912-8477', 'fields': [{'name': 'Id', 'type': 'int', 'optional': False}, {'name': 'Value', 'type': 'string', 'optional': True}, {'name': 'Menu', 'type': 'string', 'optional':
+True}, {'name': 'Conditions', 'type': 'string', 'optional': True}, {'name': 'ValidateCount', 'type': 'int', 'optional': True}, {'name': 'ValidateMode', 'type':
+'string', 'optional': True}], 'name': '@1EditPage'} 
+contract = Contract(schema=schema, private_key=priv_key, params={'Id': 2, 'Value': 'notifications'})
 tx_bin_data = contract.concat()
 ```
 

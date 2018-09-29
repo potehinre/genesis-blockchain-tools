@@ -57,7 +57,7 @@ class Contract:
     def get_struct(self):
         d = {
             'Header': {
-                'Type': self.id,
+                'ID': self.id,
                 'Time': self.time,
                 'EcosystemID': self.ecosystem_id,
                 'KeyID': self.key_id,
@@ -102,7 +102,7 @@ class Contract:
         self.signed_by = kwargs.get('signed_by', '0')
         self.bin_signatures = kwargs.get('bin_signatures', None)
         self.private_key = kwargs.get('private_key', None)
-        self.public_key = kwargs.get('public_key', get_public_key(self.private_key).encode())
+        self.public_key = kwargs.get('public_key', bytes.fromhex(get_public_key(self.private_key)))
         if not self.public_key:
             PublicKeyIsNotSetError(self.public_key)
         self.key_id = public_key_to_address(self.public_key)

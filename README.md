@@ -96,7 +96,6 @@ signature = sign(priv_key, data)
 To create client-side transaction data:
 
 ```
-from genesis_blockchain_tools.crypto import sign
 from genesis_blockchain_tools.contract import Contract
 
 priv_key = '2922bee6973370915cc63ab5ab8b7a57e1cab909477d7a030b2e4661e7aa2202'

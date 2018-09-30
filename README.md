@@ -119,7 +119,7 @@ tx_bin_data = contract.concat()
 How to attach a local file to contract:
 
 ```
-contract = Contract(schema=schema, private_key=priv_key, params={'SomeParam': 'SomeValue', 'File': {'Path: path_to_local_file}})
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParam': 'SomeValue', 'File': {'Path': path_to_local_file}})
 
 ```
 
@@ -128,7 +128,7 @@ File path by default is reduced to basename.
 
 To customize mime type or name use it like this:
 ```
-contract = Contract(schema=schema, private_key=priv_key, params={'SomeParam': 'SomeValue', 'File': {'Path: path_to_local_file, 'Name': 'file.txt', 'MimeType': 'image/gif'}})
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParam': 'SomeValue', 'File': {'Path': path_to_local_file, 'Name': 'file.txt', 'MimeType': 'image/gif'}})
 
 ```
 Also simplified path setting is available:

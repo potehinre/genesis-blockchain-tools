@@ -1,4 +1,5 @@
 import six
+import re
 
 def is_number(s):
     try:
@@ -12,3 +13,12 @@ def is_string(s):
 
 def is_bytes(s):
     return type(s) == bytes
+
+def find_mime_type_recursive(m):
+    if m and type(m) == list:
+        for item in m:
+            found = find_mime_type_recursive(item)
+            if found:
+                return found
+    elif is_string(m) and re.search('\w+\/\w+', m):
+        return m 

@@ -1,6 +1,12 @@
 import os
 import datetime
 import re
+import logging
+import puremagic
+
+from ..utils import find_mime_type_recursive
+
+logger = logging.getLogger(__name__)
 
 class Field:
     @property
@@ -96,72 +102,91 @@ class BytesField(Field):
         try:
             self._value = bytearray(tuple(map(lambda v: int(v), value)))
         except TypeError:
-            print("value: %s" % value)
             self._value = bytearray([int(value)])
 
 class FileField(Field):
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        self._path = value
+        if self._path:
+            self._path = str(self._path)
+            self.name = os.path.basename(self._path)
+
     @property
     def name(self):
         return self._name
 
     @name.setter
     def name(self, value):
-        self._name = str(value)
-
-    @property
-    def path(self):
-        return self._path
-
-    @path.setter
-    def path(self, *args):
-        if len(args) > 0:
-            self._path = str(args[0])
-        else:
-            self._path = str(self._value)
-        self.name = os.path.basename(self._path)
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, *args):
-        if len(args) > 0:
-            self._name = str(args[0])
-        else:
-            self._name = str(self._value)
+        self._name = value
+        if self._name:
+            self._name = str(self._name)
 
     @property
     def mime_type(self):
-        return self._mime_type
+        if self._mime_type:
+            return self._mime_type
+        else:
+            if self.auto_detect_mime_type:
+                if self.path and os.path.isfile(self.path) \
+                and os.access(self.path, os.R_OK):
+                    m = find_mime_type_recursive(
+                            puremagic.magic_file(self.path)
+                    )
+                    if m:
+                        return m
+                    else:
+                        logger.warning("Can't detect mime type of file '%s'. Using default mime type: %s" % (self.path, self.default_mime_type))
+                        return self.default_mime_type
+                else:
+                    logger.warning("File '%s' isn't readable. Skipping mime type auto detection, using default mime type: %s" % (self.path, self.default_mime_type))
+                    return self.default_mime_type
+            else:
+                return self.default_mime_type
 
     @mime_type.setter
-    def mime_type(self, *args):
-        if len(args) > 0:
-            self._mime_type = str(args[0])
-        else:
-            self._mime_type = 'text/plain'
+    def mime_type(self, value):
+        self._mime_type = value
+        if self._mime_type:
+            self._mime_type = str(value)
+
+    def from_dict(self, d):
+        if d.get('path') or d.get('Path'):
+            self.path = d.get('path', d.get('Path'))
+        if d.get('name') or d.get('Name'):
+            self.name = d.get('name', d.get('Name'))
+        if d.get('body') or d.get('Body'):
+            self.body = d.get('body', d.get('Body'))
+        self._did_read = False
+        self.file_open_mode = d.get('file_open_mode', 'rb')
+        #if 'b' in self.file_open_mode:
+        #    self.default_mime_type = d.get('default_mime_type', 'application/octet-stream')
+        #else:
+        #    self.default_mime_type = d.get('default_mime_type', 'text/plain')
+        self.auto_detect_mime_type = d.get('auto_detect_mime_type', True)
+        self.default_mime_type = d.get('default_mime_type', 'text/plain')
+        if d.get('mime_type') or d.get('MimeType'):
+            self.mime_type = d.get('mime_type', d.get('MimeType'))
 
     def __init__(self, *args, **kwargs):
+        self._path = None
+        self._body = None
+        self._mime_type = None
         if len(args) > 0:
             self.value = args[0]
-        self.path = kwargs.get('path')
-        if kwargs.get('name'):
-            self.name = kwargs.get('name')
-        if kwargs.get('body'):
-            self.body = kwargs.get('body')
-        self.mime_type = kwargs.get('mime_type', 'text/plain')
-        self._did_read = False
-        self.file_open_mode = kwargs.get('file_open_mode', 'rb')
+        self.from_dict(kwargs)
 
     @property
     def body(self):
-        return self._body
+        return self._body if self._body is not None else bytes()
 
     @body.setter
-    def body(self, *args):
-        if len(args) > 0:
-            self._body = args[0]
+    def body(self, value):
+        self._body = value
 
     def read(self):
         with open(self.path, self.file_open_mode) as f:
@@ -170,9 +195,15 @@ class FileField(Field):
             self._did_read = True
         return self.body
 
+    def safe_read(self):
+        if not self.path:
+            logger.warning("Path isn't set. Skipping readding")
+            return
+        self.read()
+
     def to_dict(self):
         if not self._did_read:
-            self.read()
+            self.safe_read()
         d = {
             'Name': self.name,
             'MimeType': self.mime_type,
@@ -186,4 +217,5 @@ class FileField(Field):
 
     @value.setter
     def value(self, value):
-        pass
+        if type(value) == dict:
+            self.from_dict(value)

@@ -14,6 +14,7 @@ requires = [
     'crccheck',
     'msgpack-pure',
     'msgpack',
+    'puremagic',
 ]
 
 setup(

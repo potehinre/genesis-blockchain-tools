@@ -3,3 +3,4 @@ cryptography
 crccheck
 msgpack-pure
 msgpack
+puremagic

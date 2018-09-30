@@ -119,7 +119,7 @@ tx_bin_data = contract.concat()
 How to attach a local file to contract:
 
 ```
-contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': {'Path: path_to_local_file}})
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParam': 'SomeValue', 'File': {'Path: path_to_local_file}})
 
 ```
 

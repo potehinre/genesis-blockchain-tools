@@ -105,7 +105,10 @@ True}, {'name': 'Conditions', 'type': 'string', 'optional': True}, {'name': 'Val
 'string', 'optional': True}], 'name': '@1EditPage'} 
 contract = Contract(schema=schema, private_key=priv_key, params={'Id': 2, 'Value': 'notifications'})
 tx_bin_data = contract.concat()
+
 ```
+How to work files in client-side transaction/contract:
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': {'Path: path_to_local_file}})
 
 Requirements
 ------------

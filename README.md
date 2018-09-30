@@ -74,6 +74,8 @@ Using pip/requirements:
 Usage
 -----
 
+### Cryptography 
+
 To get public key by private key:
 
 ```
@@ -93,6 +95,10 @@ data = "Some data to sign"
 signature = sign(priv_key, data)
 ```
 
+### Client-side transactions
+
+#### Common client-side transaction
+
 To create client-side transaction data:
 
 ```
@@ -107,8 +113,23 @@ contract = Contract(schema=schema, private_key=priv_key, params={'Id': 2, 'Value
 tx_bin_data = contract.concat()
 
 ```
-How to work files in client-side transaction/contract:
+
+#### Working with files in client-side transaction/contract:
+
+How to attach a local file to contract:
+
+```
 contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': {'Path: path_to_local_file}})
+
+```
+
+Mime type autodetection is on by default. Filename by default is reduced to basename.
+
+To customize mime type or name use it like this:
+```
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': {'Path: path_to_local_file, 'Name': 'file.txt', 'MimeType': 'image/gif'}})
+
+```
 
 Requirements
 ------------

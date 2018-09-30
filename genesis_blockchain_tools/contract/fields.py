@@ -3,6 +3,7 @@ import datetime
 import re
 import logging
 import puremagic
+from puremagic.main import PureError
 
 from ..utils import find_mime_type_recursive, is_string, is_bytes
 
@@ -147,15 +148,18 @@ class FileField(Field):
                     else:
                         logger.warning("Can't detect mime type of file '%s'. Using default mime type: %s" % (self.path, self.default_mime_type))
                         return self.default_mime_type
-                #elif not self.path and self.body:
-                #    m = find_mime_type_recursive(
-                #            puremagic.magic_string(str(self.body))
-                #    )
-                #    if m:
-                #        return m
-                #    else:
-                #        logger.warning("Can't detect mime type of body. Using default mime type: %s" % self.default_mime_type)
-                #        return self.default_mime_type
+                elif not self.path and self.body:
+                    try:
+                        m = find_mime_type_recursive(
+                                puremagic.magic_string(self.body)
+                        )
+                    except PureError:
+                        m = None
+                    if m:
+                        return m
+                    else:
+                        logger.warning("Can't detect mime type of body. Using default mime type: %s" % self.default_mime_type)
+                        return self.default_mime_type
                 else:
                     logger.warning("File '%s' isn't readable. Skipping mime type auto detection, using default mime type: %s" % (self.path, self.default_mime_type))
                     return self.default_mime_type

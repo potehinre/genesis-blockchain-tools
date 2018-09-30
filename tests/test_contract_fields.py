@@ -229,10 +229,10 @@ def test_file_field():
     assert d['Body'] == base64.b64decode(png_content)
     assert d['MimeType'] == 'image/png'
 
-    #b = FileField(base64.b64decode(gif_content))
-    #d = b.to_dict()
-    #d = b.value
-    #assert len(d) == 3
-    #assert len(d['Name']) > 0
-    #assert d['Body'] == base64.b64decode(gif_content)
-    #assert d['MimeType'] == 'image/git'
+    b = FileField(base64.b64decode(gif_content))
+    d = b.to_dict()
+    d = b.value
+    assert len(d) == 3
+    assert d['Name'] == 'Filename'
+    assert d['Body'] == base64.b64decode(gif_content)
+    assert d['MimeType'] == 'image/gif'

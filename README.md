@@ -123,11 +123,22 @@ contract = Contract(schema=schema, private_key=priv_key, params={'SomeParam': 'S
 
 ```
 
-Mime type autodetection is on by default. Filename by default is reduced to basename.
+Mime type autodetection is on by default.
+File path by default is reduced to basename.
 
 To customize mime type or name use it like this:
 ```
 contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': {'Path: path_to_local_file, 'Name': 'file.txt', 'MimeType': 'image/gif'}})
+
+```
+Also simplified path setting is available:
+```
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': string_path_to_local_file, 'Name': 'file.txt', 'MimeType': 'image/gif'}})
+
+```
+And aslo simplified raw bytes setting is available:
+```
+contract = Contract(schema=schema, private_key=priv_key, params={'SomeParem': 'SomeValue, 'File': bytes_var, 'Name': 'file.txt', 'MimeType': 'image/gif'}})
 
 ```
 

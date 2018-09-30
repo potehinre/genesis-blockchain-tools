@@ -15,7 +15,7 @@ def test_contract_1():
     c = Contract(schema=s, private_key=priv_key)
     assert c.id == s['id']
     assert c.fields == s['fields']
-    assert c.public_key == get_public_key(priv_key).encode()
+    assert c.public_key == bytes.fromhex(get_public_key(priv_key))
 
 def test_priv_pub_keys():
     priv_key = 'a5870fbc55861c6e02012be5bb9695be0074d0064022e6be7b28d1f834bba963'
@@ -28,7 +28,7 @@ def test_contract_2():
             params={'Id': 2, 'Value': 'notifications'})
     assert c.id == s['id']
     assert c.fields == s['fields']
-    assert c.public_key == get_public_key(priv_key).encode()
+    assert c.public_key == bytes.fromhex(get_public_key(priv_key))
 
     unknown_param_error_caught = False
     try:
@@ -41,7 +41,7 @@ def test_contract_2():
 
     c = Contract(schema=s, private_key=priv_key,
             params={'Id': 2, 'Value': 'notifications'})
-    assert c.public_key == get_public_key(priv_key).encode()
+    assert c.public_key == bytes.fromhex(get_public_key(priv_key))
     assert type(c.get_struct()) == dict
     assert type(c.serialize()) == bytes
     assert msgpack.unpackb(c.serialize(), raw=False)

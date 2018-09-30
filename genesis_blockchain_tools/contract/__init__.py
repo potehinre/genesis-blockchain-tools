@@ -61,7 +61,6 @@ class Contract:
                 'Time': self.time,
                 'EcosystemID': self.ecosystem_id,
                 'KeyID': self.key_id,
-                'RoleID': self.role_id,
                 'NetworkID': self.network_id,
                 'PublicKey': self.public_key,
             },
@@ -90,25 +89,33 @@ class Contract:
         self.fields = kwargs.get('fields', None)
         self.field_names = []
         self.tx_header = kwargs.get('tx_header', bytes([0x80]))
-        self.id = kwargs.get('id', None)
+        self.id = kwargs.get('id', kwargs.get('ID', None))
         self.time = kwargs.get('time',
-                               int(datetime.datetime.now().timestamp()))
+                               kwargs.get('Time', 
+                               int(datetime.datetime.now().timestamp())))
         self.update_from_schema(self.schema)
-        self.ecosystem_id = kwargs.get('ecosystem_id', 1)
-        self.network_id = kwargs.get('network_id', 1)
-        self.role_id = kwargs.get('role_id', 1)
-        self.request_id = kwargs.get('request_id', '')
-        self.token_ecosystem = kwargs.get('token_ecosystem', 0)
-        self.signed_by = kwargs.get('signed_by', '0')
-        self.bin_signatures = kwargs.get('bin_signatures', None)
+        self.ecosystem_id = kwargs.get('ecosystem_id',
+                                       kwargs.get('EcosystemID', 1))
+        self.network_id = kwargs.get('network_id',
+                                      kwargs.get('NetworkID', 1))
+        self.token_ecosystem = kwargs.get('token_ecosystem',
+                                          kwargs.get('TokenEcosystem', 0))
+        self.signed_by = kwargs.get('signed_by', 
+                                    kwargs.get('SignedBy', '0'))
+        self.bin_signatures = kwargs.get('bin_signatures',
+                                         kwargs.get('BinSignatures', None))
         self.private_key = kwargs.get('private_key', None)
-        self.public_key = kwargs.get('public_key', bytes.fromhex(get_public_key(self.private_key)))
+        self.public_key = kwargs.get('public_key',
+                    kwargs.get('PublicKey',
+                               bytes.fromhex(get_public_key(self.private_key))))
+        self.public_key = kwargs.get('public_key',
+                               bytes.fromhex(get_public_key(self.private_key)))
         if not self.public_key:
             PublicKeyIsNotSetError(self.public_key)
         self.key_id = public_key_to_address(self.public_key)
-        self.max_sum = kwargs.get('max_sum')
-        self.pay_over = kwargs.get('pay_over')
-        self.params = kwargs.get('params', {})
+        self.max_sum = kwargs.get('max_sum', kwargs.get('MaxSum', ''))
+        self.pay_over = kwargs.get('pay_over', kwargs.get('PayOver', ''))
+        self.params = kwargs.get('params', kwargs.get('Params', {}))
         self.check_input_params()
         self.prep_params()
 

@@ -4,7 +4,7 @@ import re
 import logging
 import puremagic
 
-from ..utils import find_mime_type_recursive
+from ..utils import find_mime_type_recursive, is_string, is_bytes
 
 logger = logging.getLogger(__name__)
 
@@ -99,10 +99,13 @@ class BytesField(Field):
 
     @value.setter
     def value(self, value):
-        try:
-            self._value = bytearray(tuple(map(lambda v: int(v), value)))
-        except TypeError:
-            self._value = bytearray([int(value)])
+        if is_bytes(value):
+            self._value = value
+        else:
+            try:
+                self._value = bytearray(tuple(map(lambda v: int(v), value)))
+            except TypeError:
+                self._value = bytearray([int(value)])
 
 class FileField(Field):
     @property
@@ -118,6 +121,8 @@ class FileField(Field):
 
     @property
     def name(self):
+        if not self._name and not self.path:
+            return self.default_name
         return self._name
 
     @name.setter
@@ -142,6 +147,15 @@ class FileField(Field):
                     else:
                         logger.warning("Can't detect mime type of file '%s'. Using default mime type: %s" % (self.path, self.default_mime_type))
                         return self.default_mime_type
+                #elif not self.path and self.body:
+                #    m = find_mime_type_recursive(
+                #            puremagic.magic_string(str(self.body))
+                #    )
+                #    if m:
+                #        return m
+                #    else:
+                #        logger.warning("Can't detect mime type of body. Using default mime type: %s" % self.default_mime_type)
+                #        return self.default_mime_type
                 else:
                     logger.warning("File '%s' isn't readable. Skipping mime type auto detection, using default mime type: %s" % (self.path, self.default_mime_type))
                     return self.default_mime_type
@@ -169,10 +183,12 @@ class FileField(Field):
         #    self.default_mime_type = d.get('default_mime_type', 'text/plain')
         self.auto_detect_mime_type = d.get('auto_detect_mime_type', True)
         self.default_mime_type = d.get('default_mime_type', 'text/plain')
+        self.default_name = d.get('default_name', 'Filename')
         if d.get('mime_type') or d.get('MimeType'):
             self.mime_type = d.get('mime_type', d.get('MimeType'))
 
     def __init__(self, *args, **kwargs):
+        self._name = None
         self._path = None
         self._body = None
         self._mime_type = None
@@ -219,3 +235,8 @@ class FileField(Field):
     def value(self, value):
         if type(value) == dict:
             self.from_dict(value)
+        elif is_string(value):
+            self.path = value
+        elif type(value) == bytes:
+            self.body = value
+

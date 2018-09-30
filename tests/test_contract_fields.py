@@ -73,6 +73,10 @@ def test_bytes_field():
     b.value = [3]
     assert b.value == bytearray([3])
 
+    b = BytesField()
+    b.value ="some string".encode()
+    assert b.value == "some string".encode()
+
 def test_file_field():
     tmp_file = tempfile.mktemp()
     tmp_path = str(tmp_file)
@@ -207,3 +211,28 @@ def test_file_field():
     assert d['Name'] == 'file.png'
     assert d['Body'] == base64.b64decode(png_content)
     assert d['MimeType'] == 'image/png'
+
+    b = FileField({'path': tmp_png_path, 'Name': 'file.png',
+                    'MimeType': 'custom/mime'})
+    d = b.to_dict()
+    d = b.value
+    assert len(d) == 3
+    assert d['Name'] == 'file.png'
+    assert d['Body'] == base64.b64decode(png_content)
+    assert d['MimeType'] == 'custom/mime'
+
+    b = FileField(tmp_png_path)
+    d = b.to_dict()
+    d = b.value
+    assert len(d) == 3
+    assert len(d['Name']) > 0
+    assert d['Body'] == base64.b64decode(png_content)
+    assert d['MimeType'] == 'image/png'
+
+    #b = FileField(base64.b64decode(gif_content))
+    #d = b.to_dict()
+    #d = b.value
+    #assert len(d) == 3
+    #assert len(d['Name']) > 0
+    #assert d['Body'] == base64.b64decode(gif_content)
+    #assert d['MimeType'] == 'image/git'

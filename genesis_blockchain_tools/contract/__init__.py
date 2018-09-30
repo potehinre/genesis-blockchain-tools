@@ -108,8 +108,6 @@ class Contract:
         self.public_key = kwargs.get('public_key',
                     kwargs.get('PublicKey',
                                bytes.fromhex(get_public_key(self.private_key))))
-        self.public_key = kwargs.get('public_key',
-                               bytes.fromhex(get_public_key(self.private_key)))
         if not self.public_key:
             PublicKeyIsNotSetError(self.public_key)
         self.key_id = public_key_to_address(self.public_key)

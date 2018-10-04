@@ -1,5 +1,6 @@
 import datetime 
 import msgpack
+import random
 from random import randint
 
 from ..crypto import sign, get_public_key
@@ -95,6 +96,7 @@ class Contract:
         self.time = kwargs.get('time',
                                kwargs.get('Time', 
                                int(datetime.datetime.now().timestamp())))
+        random.seed()
         self.nonce = kwargs.get('nonce', kwargs.get('Nonce',
                                                  randint(0, 10000000000000)))
         self.update_from_schema(self.schema)

@@ -1,5 +1,6 @@
 import datetime 
 import msgpack
+from random import randint
 
 from ..crypto import sign, get_public_key
 from ..convert import encode_length_plus_data
@@ -59,6 +60,7 @@ class Contract:
             'Header': {
                 'ID': self.id,
                 'Time': self.time,
+                'Nonce': self.nonce,
                 'EcosystemID': self.ecosystem_id,
                 'KeyID': self.key_id,
                 'NetworkID': self.network_id,
@@ -93,6 +95,8 @@ class Contract:
         self.time = kwargs.get('time',
                                kwargs.get('Time', 
                                int(datetime.datetime.now().timestamp())))
+        self.nonce = kwargs.get('nonce', kwargs.get('Nonce',
+                                                 randint(0, 10000000000000)))
         self.update_from_schema(self.schema)
         self.ecosystem_id = kwargs.get('ecosystem_id',
                                        kwargs.get('EcosystemID', 1))

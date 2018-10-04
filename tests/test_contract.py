@@ -8,6 +8,7 @@ from genesis_blockchain_tools.contract import (
     ArrayField, BytesField, FileField,
     UnknownParamError,
 )
+from genesis_blockchain_tools.utils import is_number, is_string, is_bytes
 
 def test_contract_1():
     priv_key = 'a5870fbc55861c6e02012be5bb9695be0074d0064022e6be7b28d1f834bba963'
@@ -16,6 +17,22 @@ def test_contract_1():
     assert c.id == s['id']
     assert c.fields == s['fields']
     assert c.public_key == bytes.fromhex(get_public_key(priv_key))
+    s = c.get_struct()
+    assert 'Header' in s
+    assert s['Header']
+    assert type(s['Header']) == dict
+
+    for k in ('ID', 'Time', 'Nonce', 'EcosystemID', 'KeyID', 'NetworkID'):
+        assert k in s['Header']
+        assert s['Header'][k]
+        assert is_number(s['Header'][k])
+
+    for k in ('PublicKey',):
+        assert k in s['Header']
+        assert s['Header'][k]
+        assert is_bytes(s['Header'][k])
+
+    assert 'Params' in s
 
 def test_priv_pub_keys():
     priv_key = 'a5870fbc55861c6e02012be5bb9695be0074d0064022e6be7b28d1f834bba963'

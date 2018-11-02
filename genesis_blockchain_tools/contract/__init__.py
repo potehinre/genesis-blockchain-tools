@@ -1,6 +1,9 @@
 import datetime 
+import os
 import msgpack
 import random
+import subprocess
+import binascii
 from random import randint
 
 from ..crypto import sign, get_public_key
@@ -19,78 +22,54 @@ class NonOptionalParamIsNotSetError(Error): pass
 class UnknownParamTypeError(Error): pass
 class UnknownParamError(Error): pass
 
+def binsign(pk, data):
+    with open('tx', 'wb') as f:
+        f.write(data)
+    output = subprocess.check_output(['./signtool', pk, 'tx']).rstrip()
+    return output
+
 class Contract:
-    type_field_map = {
-        "bool": BooleanField,
-        "int": IntegerField,
-        "float": FloatField,
-        "money": MoneyField,
-        "string": StringField,
-        "bytes": BytesField,
-        "array": ArrayField,
-        "file": FileField,
-    }
-    def update_from_schema(self, schema):
-        self.schema = schema
-        if 'id' in self.schema:
-            self.id = schema['id']
-        if 'fields' in self.schema:
-            self.fields = schema['fields']
-        if self.fields:
-            self.fields_names = []
-            [self.field_names.append(f['name']) for f in self.fields]
+    def serialize(self):
+        return msgpack.packb(self.get_struct(), use_bin_type=True)
 
-    def check_input_params(self):
-        for name in self.params:
-            if name not in self.field_names:
-                raise UnknownParamError(name)
+    def calc_hash(self):
+        bin_signatures = self.bin_signatures
+        self.bin_signatures = None
+        hsh = double_hash(self.serialize())
+        self.bin_signatures = bin_signatures
+        return hsh
 
-    def prep_params(self):
-        self._params = {}
-        for field in self.fields:
-            if field['type'] not in self.type_field_map:
-                raise UnknownParamTypeError(field['type'])
-            if field['name'] in self.params:
-                self._params[field['name']] = self.type_field_map[field['type']](self.params[field['name']]).value
-            else:
-                if not field['optional']:
-                    raise NonOptionalParamIsNotSetError(field['name'])
+    def sign(self):
+        return binascii.unhexlify(binsign(self.private_key, self.serialize()))
+
+    def concat(self):
+        return self.serialize()
 
     def get_struct(self):
+        files = {}
+        for name, path in self.files.items():
+            with open(path, "rb") as f:
+                    data = f.read()
+                    hsh = double_hash(data)
+                    mime = "Content-Type: application/json"
+                    files[name] = {"FileHeader": {"Hash": hsh, "MimeType": mime}, "Data": data}
         d = {
             'Header': {
-                'ID': self.id,
                 'Time': self.time,
+                'Name': self.name,
                 'Nonce': self.nonce,
                 'EcosystemID': self.ecosystem_id,
                 'KeyID': self.key_id,
                 'NetworkID': self.network_id,
                 'PublicKey': self.public_key,
+                'BinSignatures': self.bin_signatures,
             },
-            'Params': self._params
+            'Params': self.params,
+            'Files': files,
         }
         return d
 
-    def serialize(self):
-        return msgpack.packb(self.get_struct(), use_bin_type=True)
-
-    def calc_hash(self):
-        return double_hash(self.serialize())
-
-    def sign(self):
-        return bytes.fromhex(sign(self.private_key, double_hash(self.serialize())))
-
-    def concat(self):
-        return self.tx_header \
-                + encode_length_plus_data(self.serialize()) \
-                + encode_length_plus_data(self.sign())
-
     def __init__(self, *args, **kwargs):
-        self.schema = kwargs.get('schema', None)
-        if not self.schema:
-            raise SchemaIsNotSetError(self.schema)
-        self.fields = kwargs.get('fields', None)
-        self.field_names = []
         self.tx_header = kwargs.get('tx_header', bytes([0x80]))
         self.id = kwargs.get('id', kwargs.get('ID', None))
         self.time = kwargs.get('time',
@@ -99,7 +78,6 @@ class Contract:
         random.seed()
         self.nonce = kwargs.get('nonce', kwargs.get('Nonce',
                                                  randint(0, 10000000000000)))
-        self.update_from_schema(self.schema)
         self.ecosystem_id = kwargs.get('ecosystem_id',
                                        kwargs.get('EcosystemID', 1))
         self.network_id = kwargs.get('network_id',
@@ -120,6 +98,6 @@ class Contract:
         self.max_sum = kwargs.get('max_sum', kwargs.get('MaxSum', ''))
         self.pay_over = kwargs.get('pay_over', kwargs.get('PayOver', ''))
         self.params = kwargs.get('params', kwargs.get('Params', {}))
-        self.check_input_params()
-        self.prep_params()
-
+        self.files = kwargs.get('files', kwargs.get('Files', {}))
+        self.name = kwargs.get('name', kwargs.get('Name', {}))
+        self.bin_signatures = self.sign()
